@@ -1,0 +1,234 @@
+{
+  "name": "grok-cli-copilot",
+  "displayName": "Grok CLI Copilot",
+  "description": "AI coding copilot for VS Code powered by the local Grok CLI — chat, agentic edits, slash commands, file & folder context, @-mentions, image paste, and live sessions in a focused sidebar.",
+  "version": "3.1.20",
+  "publisher": "JacobTheJacobs",
+  "author": {
+    "name": "Jacob The Jacobs",
+    "url": "https://github.com/JacobTheJacobs"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/JacobTheJacobs/vscode-supergrok",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JacobTheJacobs/vscode-supergrok"
+  },
+  "bugs": {
+    "url": "https://github.com/JacobTheJacobs/vscode-supergrok/issues"
+  },
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "grok",
+    "grok ai",
+    "grok cli",
+    "grok-cli-copilot",
+    "supergrok",
+    "super grok",
+    "xai",
+    "ai",
+    "ai assistant",
+    "ai chat",
+    "ai agent",
+    "ai coding assistant",
+    "llm",
+    "chat",
+    "chatbot",
+    "copilot",
+    "code assistant",
+    "coding agent",
+    "agent",
+    "pair programming",
+    "code generation",
+    "autocomplete",
+    "refactor",
+    "sidebar",
+    "sessions",
+    "slash commands",
+    "multimodal",
+    "image paste",
+    "developer tools"
+  ],
+  "icon": "resources/supergrok-icon.png",
+  "galleryBanner": {
+    "color": "#111111",
+    "theme": "dark"
+  },
+  "main": "./out/extension/activate.js",
+  "contributes": {
+    "viewsContainers": {
+      "secondarySidebar": [
+        {
+          "id": "superGrokSidebar",
+          "title": "Super Grok",
+          "icon": "resources/supergrok-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "superGrokSidebar": [
+        {
+          "type": "webview",
+          "id": "superGrok.chat",
+          "name": "Super Grok"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "superGrok.open",
+        "title": "Grok CLI Copilot: Focus Sidebar"
+      },
+      {
+        "command": "superGrok.newSession",
+        "title": "Grok CLI Copilot: New Session"
+      },
+      {
+        "command": "superGrok.compact",
+        "title": "Grok CLI Copilot: Compact Session"
+      },
+      {
+        "command": "superGrok.pickModel",
+        "title": "Grok CLI Copilot: Switch Model"
+      },
+      {
+        "command": "superGrok.toggleMode",
+        "title": "Grok CLI Copilot: Toggle Agent / Plan Mode"
+      },
+      {
+        "command": "superGrok.sendSelection",
+        "title": "Grok CLI Copilot: Ask About Selection"
+      },
+      {
+        "command": "superGrok.sendFile",
+        "title": "Grok CLI Copilot: Add File to Chat"
+      },
+      {
+        "command": "superGrok.insertAtMention",
+        "title": "Grok CLI Copilot: Mention Active File"
+      },
+      {
+        "command": "superGrok.showLogs",
+        "title": "Grok CLI Copilot: Open Logs"
+      },
+      {
+        "command": "superGrok.logout",
+        "title": "Grok CLI Copilot: Sign Out"
+      },
+      {
+        "command": "superGrok._debugDummyPlan",
+        "title": "Grok CLI Copilot: Debug — Show dummy plan card (for testing Approve/Reject/Cancel)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "superGrok.open",
+        "key": "ctrl+;",
+        "mac": "cmd+;"
+      },
+      {
+        "command": "superGrok.insertAtMention",
+        "key": "alt+g",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "superGrok.sendSelection",
+          "when": "editorHasSelection",
+          "group": "superGrok@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "superGrok.sendFile",
+          "when": "resourceScheme == file",
+          "group": "superGrok@1"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "superGrok.sendFile",
+          "when": "resourceScheme == file",
+          "group": "superGrok@1"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Grok CLI Copilot",
+      "properties": {
+        "grok.cliPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the Grok CLI binary. Leave empty to auto-detect from ~/.grok/bin/grok and then PATH."
+        },
+        "grok.defaultModel": {
+          "type": "string",
+          "default": "",
+          "description": "Default model for new Grok CLI Copilot sessions. Leave empty to use the CLI default."
+        },
+        "grok.includeActiveFileByDefault": {
+          "type": "boolean",
+          "default": true,
+          "description": "Attach the active editor file as a context chip by default."
+        },
+        "grok.defaultEffort": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh"
+          ],
+          "enumDescriptions": [
+            "CLI default (no flag passed to grok agent stdio)",
+            "None",
+            "Minimal",
+            "Low — faster, lighter reasoning",
+            "Medium",
+            "High",
+            "XHigh — deepest reasoning, slowest"
+          ],
+          "default": "",
+          "description": "Default reasoning effort for new sessions. Uses the Grok CLI --reasoning-effort values and restarts the session when changed."
+        },
+        "grok.useCtrlEnterToSend": {
+          "type": "boolean",
+          "default": false,
+          "description": "Send with Ctrl/Cmd+Enter and keep Enter for new lines."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\"",
+    "vscode:prepublish": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\" && tsc -p .",
+    "compile": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\" && tsc -p .",
+    "watch": "tsc -p . -w",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:live": "npm run compile && node scripts/live-tests.cjs",
+    "prepackage": "node -e \"for (const f of require('fs').readdirSync('.')) if (f.endsWith('.vsix')) require('fs').unlinkSync(f)\"",
+    "package": "npx @vscode/vsce package --githubBranch master",
+    "publish": "npx @vscode/vsce publish --githubBranch master"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.94.0",
+    "happy-dom": "^20.9.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
