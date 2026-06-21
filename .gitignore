@@ -1,0 +1,10 @@
+node_modules/
+out/
+*.vsix
+!releases/*.vsix
+.vscode-test/
+.vscode-ext-debug/
+.DS_Store
+.env
+.claude/
+.grok/
