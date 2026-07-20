@@ -1554,6 +1554,7 @@
     body.appendChild(item);
     if (call.toolCallId) state.toolItemsByToolCallId.set(call.toolCallId, item);
     hdr.innerHTML =
+      `<span class="step-dot"></span>` +
       `<span class="tool-group-label">${escapeHtml(inProgressLabel(call))}</span>` +
       `<span class="tool-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>` +
       `<span class="tool-chevron" aria-hidden="true">›</span>`;
@@ -1611,7 +1612,8 @@
     const hdr = el.querySelector(".tool-group-header");
     if (hdr) {
       hdr.innerHTML =
-        `<span class="tool-group-label">${escapeHtml(hostActivityLabel(activity))}</span>` +
+        `<span class="step-dot"></span>` +
+      `<span class="tool-group-label">${escapeHtml(hostActivityLabel(activity))}</span>` +
         `<span class="tool-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>` +
         `<span class="tool-chevron" aria-hidden="true">›</span>`;
     }
@@ -1930,8 +1932,11 @@
       el.className = "msg thinking";
       const hdr = document.createElement("div");
       hdr.className = "thinking-header";
+      // A dot on the rail, not a chevron: the row reads as one step in a
+      // timeline rather than a collapsed panel header.
       hdr.innerHTML =
-        `<span class="thinking-chevron">▶</span>` +
+        `<span class="step-dot"></span>` +
+        `<span class="thinking-chevron" hidden>▶</span>` +
         `<span class="thinking-verb">${THINKING_VERBS[0]}</span>` +
         `<span class="thinking-dots"><span></span><span></span><span></span></span>` +
         `<span class="thinking-tokens"></span>`;

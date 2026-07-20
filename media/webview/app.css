@@ -471,10 +471,74 @@ code {
    pushed the actual answer down the view. */
 .msg.thinking {
   background: transparent;
-  padding: 2px 2px 0;
+  margin: 0;
+  padding: 5px 0 5px 16px;
   border: none;
   border-radius: 0;
   white-space: normal;
+}
+
+/* --- step rail -----------------------------------------------------------
+   Thinking and tool steps are consecutive entries on one vertical line, each
+   marked with a dot, rather than separately bordered panels. Boxing each step
+   made a short turn look like four stacked cards; the rail carries the
+   sequence and lets the eye skip straight to the answer. */
+.msg.thinking,
+.tool-group {
+  position: relative;
+}
+
+.msg.thinking::before,
+.tool-group::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: color-mix(in srgb, var(--sg-border) 85%, transparent);
+}
+
+/* Round the rail off at the first and last step of a run. */
+.msg.thinking:not(.tool-group + *)::before,
+.tool-group:not(.msg.thinking + *):not(.tool-group + *)::before {
+  top: 6px;
+}
+
+.step-dot {
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vscode-descriptionForeground);
+  opacity: 0.5;
+  flex: none;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+/* Live steps get a brighter, breathing dot. */
+.tool-group.in-progress .step-dot {
+  background: var(--sg-accent, var(--vscode-textLink-foreground));
+  opacity: 0.9;
+  animation: step-dot-pulse 1.6s ease-in-out infinite;
+}
+
+.msg.thinking .thinking-dots ~ * .step-dot,
+.msg.thinking:has(.thinking-dots) .step-dot {
+  background: var(--sg-accent, var(--vscode-textLink-foreground));
+  opacity: 0.9;
+  animation: step-dot-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes step-dot-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-dot { animation: none !important; }
 }
 body.hide-thinking .msg.thinking {
   display: none;
@@ -731,14 +795,12 @@ body.hide-thinking .msg.thinking {
 
 .tool-group {
   font-size: 11px;
-  margin: 4px 0;
-  padding: 9px 10px;
-  border: 1px solid color-mix(in srgb, var(--sg-accent) 18%, var(--sg-border));
-  border-left: none;
-  border-right: none;
+  margin: 0;
+  padding: 5px 0 5px 16px;
+  border: none;
   border-radius: 0;
-  background: color-mix(in srgb, var(--vscode-sideBar-background) 86%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 4%, transparent);
+  background: transparent;
+  box-shadow: none;
 }
 .tool-group-header {
   display: inline-flex;

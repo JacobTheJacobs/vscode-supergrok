@@ -101,6 +101,19 @@ describe("thinking indicator", () => {
     expect(tokens.textContent).toContain("14K");
   });
 
+  it("marks each step with a dot on the rail rather than a chevron", () => {
+    const h = bootWebview();
+    dispatch(h.window, { type: "agentStart" });
+    dispatch(h.window, { type: "thoughtChunk", text: "reasoning" });
+    dispatch(h.window, toolCall("t1", "grep foo"));
+
+    // One dot per step: the thinking row and the tool group.
+    expect(messages(h.doc).querySelectorAll(".step-dot").length).toBe(2);
+    // The chevron is kept for the toggle state but must not be the marker.
+    const chevron = messages(h.doc).querySelector(".thinking-chevron") as HTMLElement;
+    expect(chevron.hidden).toBe(true);
+  });
+
   it("starts collapsed so the reply is not buried under reasoning", () => {
     const h = bootWebview();
     dispatch(h.window, { type: "agentStart" });
