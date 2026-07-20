@@ -78,6 +78,29 @@ describe("thinking indicator", () => {
     expect(hdr.querySelector(".loading-dots")).toBeNull();
   });
 
+  it("shows small counts exactly rather than rounding them to 0K", () => {
+    // The pre-existing toK() helper renders 250 as "0K". Reusing it for the
+    // token readout made a real count look like zero.
+    const h = bootWebview();
+    dispatch(h.window, { type: "agentStart" });
+    dispatch(h.window, { type: "thoughtChunk", text: "x".repeat(1000) }); // ~250 tokens
+    const tokens = messages(h.doc).querySelector(".thinking-tokens") as HTMLElement;
+    expect(tokens.textContent).not.toContain("0K");
+    expect(tokens.textContent).toMatch(/~2\d\d tokens/);
+  });
+
+  it("switches to K notation only once there is a thousand", () => {
+    const h = bootWebview();
+    dispatch(h.window, { type: "agentStart" });
+    dispatch(h.window, {
+      type: "providerNotification",
+      update: { usage: { totalTokens: 14261 } },
+    });
+    dispatch(h.window, { type: "thoughtChunk", text: "hi" });
+    const tokens = messages(h.doc).querySelector(".thinking-tokens") as HTMLElement;
+    expect(tokens.textContent).toContain("14K");
+  });
+
   it("estimates tokens while working and marks them approximate", () => {
     const h = bootWebview();
     dispatch(h.window, { type: "agentStart" });

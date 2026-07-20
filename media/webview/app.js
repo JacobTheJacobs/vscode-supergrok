@@ -184,6 +184,14 @@
   function toK(n) {
     return Math.round(n / 1000) + "K";
   }
+  /** Compact token count. `toK` alone renders 250 as "0K", so keep small
+   *  counts exact and only switch to K once there is a thousand to round. */
+  function formatTokens(n) {
+    if (!n || n < 0) return "";
+    if (n < 1000) return String(Math.round(n));
+    if (n < 10000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    return Math.round(n / 1000) + "K";
+  }
   function truncate(s, max) {
     return s.length > max ? s.slice(0, max) + "…" : s;
   }
@@ -1878,9 +1886,9 @@
    *  the model is still working is a character-count approximation and is
    *  marked with a tilde rather than presented as measured. */
   function turnTokenText() {
-    if (state.turnTokensExact) return `${toK(state.turnTokensExact)} tokens`;
+    if (state.turnTokensExact) return `${formatTokens(state.turnTokensExact)} tokens`;
     const est = Math.round(state.turnChars / 4);
-    return est >= 50 ? `~${toK(est)} tokens` : "";
+    return est >= 50 ? `~${formatTokens(est)} tokens` : "";
   }
   function updateThinkingTokens() {
     const hdr = state.activeThoughtHdrEl;
