@@ -412,22 +412,27 @@ describe("slash settings actions (model + effort disabled while busy / priming)"
 });
 
 describe("reasoning trace (regression: thinking traces no longer visible)", () => {
-  it("renders a visible thinking block whose header toggles the body open/closed", () => {
+  // The regression this guards is traces going MISSING. That protection is
+  // unchanged: the block renders, the reasoning text is in it, and the header
+  // opens it. What changed is the default — the trace now starts collapsed so
+  // the answer is not pushed below a wall of italics on every turn.
+  it("renders the thinking block with its trace, reachable from the header", () => {
     const { window, doc } = bootWebview();
     dispatch(window, { type: "thoughtChunk", text: "considering the approach…" });
     const block = doc.querySelector(".msg.thinking")!;
     const hdr = block.querySelector(".thinking-header") as HTMLElement;
     const body = block.querySelector(".thinking-body") as HTMLElement;
     const chevron = block.querySelector(".thinking-chevron") as HTMLElement;
-    expect(body.hidden).toBe(false);
-    expect(chevron.textContent).toBe("▼");
+    // The trace must exist and hold the reasoning, collapsed or not.
     expect(body.textContent).toContain("considering the approach");
-    click(window, hdr);
     expect(body.hidden).toBe(true);
     expect(chevron.textContent).toBe("▶");
     click(window, hdr);
     expect(body.hidden).toBe(false);
     expect(chevron.textContent).toBe("▼");
+    click(window, hdr);
+    expect(body.hidden).toBe(true);
+    expect(chevron.textContent).toBe("▶");
   });
   it("renders XML-ish tool thoughts as structured steps instead of raw tags", () => {
     const { window, doc } = bootWebview();

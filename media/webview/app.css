@@ -466,12 +466,13 @@ code {
 .msg-action-btn.copied { color: var(--vscode-foreground); }
 .msg-action-glyph { display: inline-flex; align-items: center; }
 .msg-timestamp { font-size: 11px; }
+/* A status line, not a panel. The reasoning is collapsed by default, so the
+   surrounding surface and rules just added weight to a single dim row and
+   pushed the actual answer down the view. */
 .msg.thinking {
-  background: var(--sg-surface-soft);
-  padding: 7px 10px;
-  border: 1px solid color-mix(in srgb, var(--sg-border) 62%, transparent);
-  border-left: none;
-  border-right: none;
+  background: transparent;
+  padding: 2px 2px 0;
+  border: none;
   border-radius: 0;
   white-space: normal;
 }

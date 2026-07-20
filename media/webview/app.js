@@ -1931,12 +1931,17 @@
       const hdr = document.createElement("div");
       hdr.className = "thinking-header";
       hdr.innerHTML =
-        `<span class="thinking-chevron">▼</span>` +
+        `<span class="thinking-chevron">▶</span>` +
         `<span class="thinking-verb">${THINKING_VERBS[0]}</span>` +
         `<span class="thinking-dots"><span></span><span></span><span></span></span>` +
         `<span class="thinking-tokens"></span>`;
       const body = document.createElement("div");
       body.className = "thinking-body";
+      // Collapsed by default: reasoning is reference material, not the answer.
+      // Expanded it buries the reply under a wall of italics on every turn;
+      // the one-line header carries the useful signal (working / how long /
+      // how many tokens) and the prose is one click away.
+      body.hidden = true;
       hdr.onclick = () => {
         const open = body.hidden;
         body.hidden = !open;

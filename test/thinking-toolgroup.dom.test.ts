@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { bootWebview, dispatch } from "./webview-harness";
+import { bootWebview, dispatch, click } from "./webview-harness";
 
 const messages = (doc: Document) => doc.getElementById("messages") as HTMLElement;
 /** Rendered order of the blocks we care about, top to bottom. */
@@ -99,6 +99,30 @@ describe("thinking indicator", () => {
     dispatch(h.window, { type: "thoughtChunk", text: "hi" });
     const tokens = messages(h.doc).querySelector(".thinking-tokens") as HTMLElement;
     expect(tokens.textContent).toContain("14K");
+  });
+
+  it("starts collapsed so the reply is not buried under reasoning", () => {
+    const h = bootWebview();
+    dispatch(h.window, { type: "agentStart" });
+    dispatch(h.window, { type: "thoughtChunk", text: "a long internal monologue" });
+
+    const body = messages(h.doc).querySelector(".thinking-body") as HTMLElement;
+    expect(body.hidden).toBe(true);
+    const chevron = messages(h.doc).querySelector(".thinking-chevron") as HTMLElement;
+    expect(chevron.textContent).toBe("▶");
+  });
+
+  it("expands on click and collapses again", () => {
+    const h = bootWebview();
+    dispatch(h.window, { type: "agentStart" });
+    dispatch(h.window, { type: "thoughtChunk", text: "reasoning" });
+
+    const hdr = messages(h.doc).querySelector(".thinking-header") as HTMLElement;
+    const body = messages(h.doc).querySelector(".thinking-body") as HTMLElement;
+    click(h.window, hdr);
+    expect(body.hidden).toBe(false);
+    click(h.window, hdr);
+    expect(body.hidden).toBe(true);
   });
 
   it("estimates tokens while working and marks them approximate", () => {
