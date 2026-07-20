@@ -6,6 +6,14 @@
 .github/**
 .grok/**
 *.log
+# Local tool state. These are not source and some hold credentials — a
+# packaged .vsix was shipping .gstack/terminal-internal-token before this.
+.gstack/**
+.prgraf/**
+.serena/**
+.swarm/**
+.beads/**
+**/*.vsix
 docs/**
 docs/research/**
 scripts/**

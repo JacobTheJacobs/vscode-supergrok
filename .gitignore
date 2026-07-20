@@ -8,3 +8,6 @@ out/
 .env
 .claude/
 .grok/
+.prgraf/
+.gstack/
+.swarm/
