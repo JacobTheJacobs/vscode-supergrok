@@ -89,6 +89,9 @@
     agentRenderScheduled: false,
     thoughtBuffer: "",
     thoughtRenderScheduled: false,
+    thinkingVerbTimer: null,
+    turnChars: 0,
+    turnTokensExact: 0,
     sessions: [],
     activeSessionId: null,
     dots: {},
@@ -1185,9 +1188,12 @@
     state.activeAgentRaw = "";
     state.activeUserEl = null;
     state.activeUserRaw = "";
+    stopThinkingTicker();
     state.activeThoughtEl = null;
     state.activeThoughtHdrEl = null;
     state.thoughtBuffer = "";
+    state.turnChars = 0;
+    state.turnTokensExact = 0;
     state.activeToolGroupEl = null;
     state.replaying = false;
     state.planHistoryQueue = [];
@@ -1451,6 +1457,13 @@
     if (verb) return verb;
     return name || "tool";
   }
+  /** Finish the current assistant bubble so later output starts a new one. */
+  function sealAgentBubble() {
+    if (!state.activeAgentEl) return;
+    flushAgent();
+    state.activeAgentEl = null;
+    state.activeAgentRaw = "";
+  }
   function closeToolGroup() {
     if (!state.activeToolGroupEl) return;
     const el = state.activeToolGroupEl;
@@ -1465,6 +1478,12 @@
     clearWelcome();
     hideGrokking();
     if (!state.activeToolGroupEl) {
+      // Seal the open assistant bubble first. Everything is appended to
+      // messagesEl in arrival order, so if the bubble stays open the model's
+      // later text keeps flowing into an element that sits ABOVE this group —
+      // which is how the tool block ends up stranded under a finished answer.
+      // Closing it here makes the next chunk start a fresh bubble below.
+      sealAgentBubble();
       const el = document.createElement("div");
       el.className = "tool-group in-progress";
       el._calls = [];
@@ -1826,6 +1845,68 @@
       state.activeThoughtEl.appendChild(notes);
     }
   }
+  // Rotating status verbs, in the spirit of Claude Code's thinking line. The
+  // point is to show liveness without implying the model is doing something
+  // specific — so they are deliberately vague and interchangeable.
+  const THINKING_VERBS = [
+    "Thinking", "Pondering", "Ruminating", "Cogitating", "Percolating",
+    "Deliberating", "Excogitating", "Transmuting", "Contemplating", "Puzzling",
+    "Noodling", "Marinating", "Synthesizing", "Untangling", "Divining",
+    "Musing", "Distilling", "Wrangling", "Mulling", "Conjuring",
+  ];
+  const VERB_ROTATE_MS = 3500;
+
+  function stopThinkingTicker() {
+    if (state.thinkingVerbTimer) {
+      clearInterval(state.thinkingVerbTimer);
+      state.thinkingVerbTimer = null;
+    }
+  }
+  function startThinkingTicker() {
+    stopThinkingTicker();
+    let i = 0;
+    state.thinkingVerbTimer = setInterval(() => {
+      const hdr = state.activeThoughtHdrEl;
+      const verb = hdr && hdr.querySelector(".thinking-verb");
+      if (!verb) return stopThinkingTicker();
+      i = (i + 1) % THINKING_VERBS.length;
+      verb.textContent = THINKING_VERBS[i];
+    }, VERB_ROTATE_MS);
+  }
+  /** Tokens for the turn: exact once the CLI reports usage, estimated before.
+   *  The CLI only sends usage at the end of a turn, so anything shown while
+   *  the model is still working is a character-count approximation and is
+   *  marked with a tilde rather than presented as measured. */
+  function turnTokenText() {
+    if (state.turnTokensExact) return `${toK(state.turnTokensExact)} tokens`;
+    const est = Math.round(state.turnChars / 4);
+    return est >= 50 ? `~${toK(est)} tokens` : "";
+  }
+  function updateThinkingTokens() {
+    const hdr = state.activeThoughtHdrEl;
+    const el = hdr && hdr.querySelector(".thinking-tokens");
+    if (!el) return;
+    const text = turnTokenText();
+    el.textContent = text ? `· ${text}` : "";
+  }
+  /** Settle the thinking header: stop animating, show elapsed time + tokens. */
+  function finishThinkingHeader() {
+    stopThinkingTicker();
+    const hdr = state.activeThoughtHdrEl;
+    if (!hdr) return;
+    const dots = hdr.querySelector(".thinking-dots");
+    if (dots) dots.remove();
+    const verb = hdr.querySelector(".thinking-verb");
+    if (verb) {
+      verb.classList.add("settled");
+      verb.textContent = state.replaying || !state.thoughtStartTime
+        ? "Thought"
+        : `Thought for ${Math.round((Date.now() - state.thoughtStartTime) / 1000)}s`;
+    }
+    updateThinkingTokens();
+    state.thoughtStartTime = null;
+  }
+
   function appendThought(text) {
     if (state.suppressReplayTurn) return;
     setTopStatus("Thinking", "running");
@@ -1841,7 +1922,11 @@
       el.className = "msg thinking";
       const hdr = document.createElement("div");
       hdr.className = "thinking-header";
-      hdr.innerHTML = `<span class="thinking-chevron">▼</span><span class="thinking-label loading-dots">Thinking</span>`;
+      hdr.innerHTML =
+        `<span class="thinking-chevron">▼</span>` +
+        `<span class="thinking-verb">${THINKING_VERBS[0]}</span>` +
+        `<span class="thinking-dots"><span></span><span></span><span></span></span>` +
+        `<span class="thinking-tokens"></span>`;
       const body = document.createElement("div");
       body.className = "thinking-body";
       hdr.onclick = () => {
@@ -1854,7 +1939,10 @@
       messagesEl.appendChild(el);
       state.activeThoughtEl = body;
       state.activeThoughtHdrEl = hdr;
+      startThinkingTicker();
     }
+    state.turnChars += text.length;
+    updateThinkingTokens();
     state.thoughtBuffer += text;
     renderThoughtBody(state.thoughtBuffer);
     if (!state.thoughtRenderScheduled) {
@@ -1882,6 +1970,8 @@
       state.activeAgentRaw = "";
     }
     state.activeAgentRaw += text;
+    state.turnChars += text.length;
+    updateThinkingTokens();
     if (!state.agentRenderScheduled) {
       state.agentRenderScheduled = true;
       requestAnimationFrame(flushAgent);
@@ -1899,16 +1989,7 @@
   function commitAgentTurn() {
     flushAgent();
     flushThought();
-    if (state.thoughtStartTime && state.activeThoughtHdrEl) {
-      const label = state.activeThoughtHdrEl.querySelector(".thinking-label");
-      if (label) {
-        label.classList.remove("loading-dots");
-        label.textContent = state.replaying
-          ? "Thought"
-          : `Thought for ${Math.round((Date.now() - state.thoughtStartTime) / 1000)}s`;
-      }
-      state.thoughtStartTime = null;
-    }
+    finishThinkingHeader();
     closeToolGroup();
     state.activeAgentEl = null;
     state.activeAgentRaw = "";
@@ -2891,12 +2972,15 @@
     if (!text && state.chips.every((c) => c.hidden)) return;
     state.busy = true;
     updateSendButton();
+    // Close rather than drop: nulling the pointer alone leaves the previous
+    // group stuck on "in-progress" with its dots blinking forever.
+    closeToolGroup();
+    finishThinkingHeader();
     state.activeAgentEl = null;
     state.activeAgentRaw = "";
     state.activeThoughtEl = null;
     state.activeThoughtHdrEl = null;
     state.thoughtStartTime = null;
-    state.activeToolGroupEl = null;
     vscode.postMessage({ type: "send", text, chips: state.chips });
     input.value = "";
     renderInputHighlight();
@@ -2977,6 +3061,9 @@
         break;
       case "agentStart":
         setTopStatus("Thinking", "running");
+        // Per-turn counters, so one turn's tokens never bleed into the next.
+        state.turnChars = 0;
+        state.turnTokensExact = 0;
         showGrokking();
         break;
       case "thoughtChunk":
@@ -3099,6 +3186,10 @@
           const wrapper = state.activeAgentEl.closest(".msg-wrapper") ?? state.activeAgentEl.parentElement;
           (wrapper ?? state.activeAgentEl).remove();
         }
+        // A reset used to leave any open group spinning and the thinking
+        // header animating forever, since it only nulled the pointers.
+        closeToolGroup();
+        finishThinkingHeader();
         state.activeAgentEl = null;
         state.activeAgentRaw = "";
         state.activeThoughtEl = null;
@@ -3173,8 +3264,18 @@
       case "error":
         addError(msg.text);
         break;
-      case "providerNotification":
+      case "providerNotification": {
+        // The CLI reports real usage here (x.ai/session_notification) before
+        // the prompt result resolves. It was being discarded; use it so the
+        // token readout stops being an estimate as soon as truth arrives.
+        const usage = msg.update && msg.update.usage;
+        if (usage && usage.totalTokens) {
+          state.turnTokensExact = usage.totalTokens;
+          updateThinkingTokens();
+          updateDonut(usage.totalTokens);
+        }
         break;
+      }
       case "sessions":
         state.sessions = msg.entries || [];
         state.activeSessionId = msg.activeId || null;

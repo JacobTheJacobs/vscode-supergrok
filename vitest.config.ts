@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     include: [
       "test/webview-ui.dom.test.ts",
+      "test/thinking-toolgroup.dom.test.ts",
       "test/acp-integration.test.ts",
       "test/acp.test.ts",
       "test/chips.test.ts",
