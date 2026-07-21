@@ -23,22 +23,38 @@ const REVIEW_URL =
 const ISSUES_URL = "https://github.com/JacobTheJacobs/vscode-supergrok/issues/new";
 
 /**
+ * In-process latch. globalState.update() is a Thenable and the new value is not
+ * guaranteed readable until it resolves, so the persisted flag alone does not
+ * stop two turns that finish in the same tick from both asking — and every open
+ * session has its own promptComplete listener. This closes synchronously.
+ */
+let askedThisProcess = false;
+
+/**
  * Record a completed turn and, at the threshold, ask once.
  * Never throws and never blocks the turn it was called from.
  */
 export function noteCompletedTurn(context: vscode.ExtensionContext): void {
   try {
+    if (askedThisProcess) return;
     if (context.globalState.get<boolean>(ASKED_KEY)) return;
 
     const turns = (context.globalState.get<number>(TURNS_KEY) ?? 0) + 1;
-    void context.globalState.update(TURNS_KEY, turns);
+    swallow(context.globalState.update(TURNS_KEY, turns));
     if (turns < TURNS_BEFORE_ASKING) return;
 
-    void context.globalState.update(ASKED_KEY, true);
+    // Latch before any await so concurrent callers cannot get past this line.
+    askedThisProcess = true;
+    swallow(context.globalState.update(ASKED_KEY, true));
     void ask(context);
   } catch {
     // Counting reviews is never worth breaking a session over.
   }
+}
+
+/** Storage can fail; a rejected write must not surface as an unhandled error. */
+function swallow(p: Thenable<unknown> | undefined): void {
+  Promise.resolve(p).catch(() => undefined);
 }
 
 async function ask(context: vscode.ExtensionContext): Promise<void> {
@@ -58,10 +74,11 @@ async function ask(context: vscode.ExtensionContext): Promise<void> {
   }
 }
 
-/** Test seam: lets a test drive the threshold without 25 real turns. */
+/** Test seam: clears the persisted counters and the in-process latch. */
 export function _reset(context: vscode.ExtensionContext): void {
-  void context.globalState.update(TURNS_KEY, 0);
-  void context.globalState.update(ASKED_KEY, false);
+  askedThisProcess = false;
+  swallow(context.globalState.update(TURNS_KEY, 0));
+  swallow(context.globalState.update(ASKED_KEY, false));
 }
 
 export const _internals = { TURNS_KEY, ASKED_KEY, TURNS_BEFORE_ASKING, REVIEW_URL };

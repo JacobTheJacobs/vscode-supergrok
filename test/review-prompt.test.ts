@@ -27,12 +27,13 @@ vi.mock("vscode", () => ({
   Uri: { parse: (s: string) => s },
 }));
 
-const { noteCompletedTurn, _internals } = await import("../src/extension/review-prompt");
+const { noteCompletedTurn, _reset, _internals } = await import("../src/extension/review-prompt");
 
 describe("review prompt", () => {
   it("stays quiet until the user has actually used it", () => {
     shown.length = 0;
     const ctx = fakeContext();
+    _reset(ctx);
     for (let i = 0; i < _internals.TURNS_BEFORE_ASKING - 1; i++) noteCompletedTurn(ctx);
     expect(shown).toHaveLength(0);
   });
@@ -40,6 +41,7 @@ describe("review prompt", () => {
   it("asks once at the threshold", () => {
     shown.length = 0;
     const ctx = fakeContext();
+    _reset(ctx);
     for (let i = 0; i < _internals.TURNS_BEFORE_ASKING; i++) noteCompletedTurn(ctx);
     expect(shown).toHaveLength(1);
   });
@@ -47,12 +49,14 @@ describe("review prompt", () => {
   it("never asks a second time, whatever the answer", () => {
     shown.length = 0;
     const ctx = fakeContext();
+    _reset(ctx);
     for (let i = 0; i < _internals.TURNS_BEFORE_ASKING * 4; i++) noteCompletedTurn(ctx);
     expect(shown).toHaveLength(1);
   });
 
   it("counts turns rather than sessions", () => {
     const ctx = fakeContext();
+    _reset(ctx);
     noteCompletedTurn(ctx);
     noteCompletedTurn(ctx);
     expect(ctx.globalState.get(_internals.TURNS_KEY)).toBe(2);
@@ -63,6 +67,7 @@ describe("review prompt", () => {
     shown.length = 0;
     answer = "Write a review";
     const ctx = fakeContext();
+    _reset(ctx);
     for (let i = 0; i < _internals.TURNS_BEFORE_ASKING; i++) noteCompletedTurn(ctx);
     await new Promise((r) => setTimeout(r, 0));
     expect(opened[0]).toContain("marketplace.visualstudio.com");
@@ -73,6 +78,7 @@ describe("review prompt", () => {
     shown.length = 0;
     answer = "Report a problem";
     const ctx = fakeContext();
+    _reset(ctx);
     for (let i = 0; i < _internals.TURNS_BEFORE_ASKING; i++) noteCompletedTurn(ctx);
     await new Promise((r) => setTimeout(r, 0));
     expect(opened[0]).toContain("github.com");
@@ -84,6 +90,7 @@ describe("review prompt", () => {
     shown.length = 0;
     answer = "No thanks";
     const ctx = fakeContext();
+    _reset(ctx);
     for (let i = 0; i < _internals.TURNS_BEFORE_ASKING; i++) noteCompletedTurn(ctx);
     await new Promise((r) => setTimeout(r, 0));
     expect(opened).toHaveLength(0);
