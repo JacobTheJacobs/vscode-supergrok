@@ -55,10 +55,14 @@ with the patience of a saint and the results of a brick.
 ## Features
 
 - chat with the local Grok CLI without leaving your editor
+- a quiet transcript: thinking and tool steps sit on one vertical rail, each a
+  single dim line — a dot, what it's doing, and how many tokens it has spent —
+  so the answer stays where you're looking instead of below a wall of reasoning
+- expand any step to read the full trace; collapsed is the default
 - session history and quick switching, because you will lose track
 - slash commands (with search) and effort control — dial the reasoning up or down
 - file/folder context, `@` mentions, and image paste
-- inline generated media, thinking blocks, and permission cards (it asks before it touches anything)
+- inline generated media and permission cards (it asks before it touches anything)
 
 ## Settings
 
