@@ -5,6 +5,22 @@ Notable changes to Grok CLI Copilot.
 This file starts at 3.1.35. Earlier releases shipped without itemised notes and
 are not reconstructed here rather than guessed at.
 
+## [3.1.37]
+
+### Added
+
+- A one-time review prompt. After 25 completed turns — not on install — it asks
+  once whether you'd leave a Marketplace review, and offers the issue tracker as
+  the alternative so an unhappy user has somewhere useful to go instead of a
+  public rating. Declining is permanent; it never asks twice.
+
+## [3.1.36]
+
+### Added
+
+- Demo clip in the README, rendered from the real webview.
+- This changelog.
+
 ## [3.1.35]
 
 ### Changed
