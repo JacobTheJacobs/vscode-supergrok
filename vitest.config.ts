@@ -5,8 +5,6 @@ export default defineConfig({
     include: [
       "test/webview-ui.dom.test.ts",
       "test/thinking-toolgroup.dom.test.ts",
-      "test/review-prompt.test.ts",
-      "test/review-race.test.ts",
       "test/acp-integration.test.ts",
       "test/acp.test.ts",
       "test/chips.test.ts",

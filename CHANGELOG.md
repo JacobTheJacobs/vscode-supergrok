@@ -5,6 +5,13 @@ Notable changes to Grok CLI Copilot.
 This file starts at 3.1.35. Earlier releases shipped without itemised notes and
 are not reconstructed here rather than guessed at.
 
+## [3.1.38]
+
+### Removed
+
+- The review prompt added in 3.1.37. Asking for ratings inside the editor is
+  interruption the extension does not need to earn its keep.
+
 ## [3.1.37]
 
 ### Added

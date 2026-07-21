@@ -23,7 +23,6 @@ import { pickRejectOption, shouldRejectPermission } from "../plan/gate";
 import { appendPlanEntry, decideRestoreState } from "../plan/restore";
 import { planReviewFileBaseName, sanitizePlanReviewFilePart } from "../plan/review";
 import { GROK_PRIMER, isPrimerText } from "../plan/primer";
-import { noteCompletedTurn } from "./review-prompt";
 import {
   SessionListEntry,
   SessionMetaOverrides,
@@ -906,8 +905,6 @@ See design doc for the full state machine diagram.`;
     client.on("promptComplete", (meta) => {
       if (gen !== session.gen) return;
       this.emit(session, { type: "promptComplete", meta });
-      // Counts real, finished turns — the only population worth asking.
-      noteCompletedTurn(this.context);
     });
     client.on("providerNotification", (u) => {
       if (gen !== session.gen) return;
