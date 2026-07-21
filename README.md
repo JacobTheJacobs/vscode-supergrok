@@ -17,6 +17,9 @@
 A focused VS Code sidebar that puts the local Grok CLI where you already live —
 next to your code, instead of in yet another browser tab.
 
+![Grok CLI Copilot — a turn from prompt to answer](https://raw.githubusercontent.com/JacobTheJacobs/vscode-supergrok/master/docs/media/demo.gif)
+
+
 [![Grok CLI Copilot screenshot](image.png)](https://marketplace.visualstudio.com/items?itemName=jacobthejacobs.grok-cli-copilot)
 
 [![Grok CLI Copilot — connected and ready](image-2.png)](https://marketplace.visualstudio.com/items?itemName=jacobthejacobs.grok-cli-copilot)
