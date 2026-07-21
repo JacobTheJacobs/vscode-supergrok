@@ -211,8 +211,8 @@
     "test:watch": "vitest",
     "test:live": "npm run compile && node scripts/live-tests.cjs",
     "prepackage": "node -e \"for (const f of require('fs').readdirSync('.')) if (f.endsWith('.vsix')) require('fs').unlinkSync(f)\"",
-    "package": "npx @vscode/vsce package --githubBranch master",
-    "publish": "npx @vscode/vsce publish --githubBranch master"
+    "package": "npx @vscode/vsce package --no-dependencies --githubBranch master",
+    "publish": "npx @vscode/vsce publish --no-dependencies --githubBranch master"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

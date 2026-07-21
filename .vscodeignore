@@ -23,7 +23,8 @@ tsconfig.json
 package-lock.json
 pnpm-lock.yaml
 node_modules/**
-!node_modules/ws/**
+# (no runtime dependencies: package.json 'dependencies' is empty, and
+#  packaging runs with --no-dependencies, so node_modules is never walked)
 .git/**
 **/*.map
 **/*.ts
