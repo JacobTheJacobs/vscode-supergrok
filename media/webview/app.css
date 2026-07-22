@@ -1,4 +1,6 @@
 :root {
+  /* Left inset for the step rail and its dots. */
+  --sg-rail: 11px;
   --pad: 8px;
   --gap: 6px;
   --radius: 6px;
@@ -239,7 +241,8 @@ code {
   padding: 12px 0 14px;
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  /* Steps in one run should read as a sequence, not separate cards. */
+  gap: 6px;
   scroll-behavior: smooth;
 }
 
@@ -472,7 +475,7 @@ code {
 .msg.thinking {
   background: transparent;
   margin: 0;
-  padding: 5px 0 5px 16px;
+  padding: 2px 0 2px 24px;
   border: none;
   border-radius: 0;
   white-space: normal;
@@ -492,7 +495,9 @@ code {
 .tool-group::before {
   content: "";
   position: absolute;
-  left: 3px;
+  /* Rail and dots are inset so the thread starts inside the panel rather than
+     hugging the edge; --sg-rail keeps the line centred under the dot. */
+  left: var(--sg-rail);
   top: 0;
   bottom: 0;
   width: 1px;
@@ -507,7 +512,7 @@ code {
 
 .step-dot {
   position: absolute;
-  left: 0;
+  left: calc(var(--sg-rail) - 3px);
   top: 9px;
   width: 7px;
   height: 7px;
@@ -796,7 +801,7 @@ body.hide-thinking .msg.thinking {
 .tool-group {
   font-size: 11px;
   margin: 0;
-  padding: 5px 0 5px 16px;
+  padding: 2px 0 2px 24px;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -847,7 +852,7 @@ body.hide-thinking .msg.thinking {
   40% { opacity: 1; }
 }
 .tool-group-body {
-  margin-top: 7px;
+  margin-top: 4px;
   padding: 1px 0 1px 9px;
   border-left: 1px solid color-mix(in srgb, var(--sg-accent) 46%, var(--sg-border));
   margin-left: 5px;
