@@ -1499,7 +1499,11 @@
       hdr.className = "tool-group-header";
       const body = document.createElement("div");
       body.className = "tool-group-body";
-      el.classList.add("expanded");
+      // Closed by default: the commands a run executed are reference, not the
+      // answer, and an expanded group buries the conclusion under file dumps.
+      // The header keeps the label and live status, so nothing needed to follow
+      // the run is hidden — the detail is one click away.
+      body.hidden = true;
       el.appendChild(hdr);
       el.appendChild(body);
       messagesEl.appendChild(el);
