@@ -1,6 +1,10 @@
 :root {
-  /* Left inset for the step rail and its dots. */
-  --sg-rail: 11px;
+  /* Left inset for the step rail and its dots, plus the text indent that
+     clears them. Matched to Claude Code: the dot sits ~10px in and the label
+     starts ~32px in, so a run reads as an indented thread rather than text
+     pinned to the panel edge. */
+  --sg-rail: 16px;
+  --sg-step-indent: 32px;
   --pad: 8px;
   --gap: 6px;
   --radius: 6px;
@@ -475,7 +479,7 @@ code {
 .msg.thinking {
   background: transparent;
   margin: 0;
-  padding: 2px 0 2px 24px;
+  padding: 2px 0 2px var(--sg-step-indent);
   border: none;
   border-radius: 0;
   white-space: normal;
@@ -801,7 +805,7 @@ body.hide-thinking .msg.thinking {
 .tool-group {
   font-size: 11px;
   margin: 0;
-  padding: 2px 0 2px 24px;
+  padding: 2px 0 2px var(--sg-step-indent);
   border: none;
   border-radius: 0;
   background: transparent;
