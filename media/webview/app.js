@@ -1508,9 +1508,11 @@
       el.appendChild(body);
       messagesEl.appendChild(el);
       hdr.onclick = () => {
-        const expanded = !body.hidden;
-        body.hidden = expanded;
-        el.classList.toggle("expanded", !expanded);
+        // .expanded drives visibility via CSS; body.hidden is kept in sync so
+        // assistive tech and any code reading it agree with what is painted.
+        const nowOpen = !el.classList.contains("expanded");
+        el.classList.toggle("expanded", nowOpen);
+        body.hidden = !nowOpen;
       };
       state.activeToolGroupEl = el;
     }

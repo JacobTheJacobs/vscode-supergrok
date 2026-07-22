@@ -2,7 +2,7 @@
   "name": "grok-cli-copilot",
   "displayName": "Grok CLI Copilot",
   "description": "AI coding copilot for VS Code powered by the local Grok CLI — chat, agentic edits, slash commands, file & folder context, @-mentions, image paste, and live sessions in a focused sidebar.",
-  "version": "3.1.41",
+  "version": "3.1.42",
   "publisher": "JacobTheJacobs",
   "author": {
     "name": "Jacob The Jacobs",

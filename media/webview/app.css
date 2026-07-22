@@ -855,6 +855,13 @@ body.hide-thinking .msg.thinking {
   0%, 80%, 100% { opacity: 0.2; }
   40% { opacity: 1; }
 }
+/* Closed unless the group is explicitly expanded.
+   The JS also sets body.hidden, but relying on every creation path to
+   remember that is how this regressed once already: one path was missed and
+   groups rendered open. This rule holds regardless of which path built the
+   element, so a future code path cannot reintroduce the bug. */
+.tool-group:not(.expanded) > .tool-group-body { display: none; }
+
 .tool-group-body {
   margin-top: 4px;
   padding: 1px 0 1px 9px;
