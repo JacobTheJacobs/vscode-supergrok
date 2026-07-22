@@ -3,8 +3,12 @@
      clears them. Matched to Claude Code: the dot sits ~10px in and the label
      starts ~32px in, so a run reads as an indented thread rather than text
      pinned to the panel edge. */
-  --sg-rail: 16px;
-  --sg-step-indent: 32px;
+  /* Claude hangs the step dot in a gutter LEFT of a shared content column,
+     rather than letting it sit flush with the message text. Measured: the dot
+     was at 14px and the answer at 11px, so raising the rail alone read as no
+     change at all — the two have to move together to look like a thread. */
+  --sg-rail: 24px;
+  --sg-step-indent: 44px;
   --pad: 8px;
   --gap: 6px;
   --radius: 6px;
@@ -398,6 +402,9 @@ code {
   flex-direction: column;
   gap: 4px;
   padding: 8px 10px;
+  /* --sg-step-indent aligns the answer with the tool/thinking labels above it
+     so one turn reads as a single column with the rail in the margin. */
+  padding-left: var(--sg-step-indent);
   border-radius: var(--radius);
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -555,11 +562,13 @@ body.hide-thinking .msg.thinking {
 .thinking-header {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   cursor: pointer;
   color: var(--vscode-descriptionForeground);
   font-size: 11px;
-  padding: 2px 3px;
+  /* No left padding: the thinking label must start on the same x as a tool
+     label, or consecutive steps in one turn sit 3px out of line. */
+  padding: 2px 3px 2px 0;
   border-radius: 4px;
   user-select: none;
 }

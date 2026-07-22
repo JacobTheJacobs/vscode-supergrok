@@ -1,8 +1,8 @@
 {
   "name": "grok-cli-copilot",
   "displayName": "Grok CLI Copilot",
-  "description": "AI coding copilot for VS Code powered by the local Grok CLI — chat, agentic edits, slash commands, file & folder context, @-mentions, image paste, and live sessions in a focused sidebar.",
-  "version": "3.1.42",
+  "description": "AI coding copilot for VS Code powered by the local Grok CLI \u2014 chat, agentic edits, slash commands, file & folder context, @-mentions, image paste, and live sessions in a focused sidebar.",
+  "version": "3.1.43",
   "publisher": "JacobTheJacobs",
   "author": {
     "name": "Jacob The Jacobs",
@@ -125,7 +125,7 @@
       },
       {
         "command": "superGrok._debugDummyPlan",
-        "title": "Grok CLI Copilot: Debug — Show dummy plan card (for testing Approve/Reject/Cancel)"
+        "title": "Grok CLI Copilot: Debug \u2014 Show dummy plan card (for testing Approve/Reject/Cancel)"
       }
     ],
     "keybindings": [
@@ -191,10 +191,10 @@
             "CLI default (no flag passed to grok agent stdio)",
             "None",
             "Minimal",
-            "Low — faster, lighter reasoning",
+            "Low \u2014 faster, lighter reasoning",
             "Medium",
             "High",
-            "XHigh — deepest reasoning, slowest"
+            "XHigh \u2014 deepest reasoning, slowest"
           ],
           "default": "",
           "description": "Default reasoning effort for new sessions. Uses the Grok CLI --reasoning-effort values and restarts the session when changed."
